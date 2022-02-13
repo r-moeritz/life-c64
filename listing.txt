@@ -1,0 +1,591 @@
+               ;--------------------------------------;
+               ;       LIFE BY JUERGEN ENGBRING       ;
+               ;                                      ;
+               ;  FEATURED IN 64'ER MAGAZINE 1986/01  ;
+               ; REASSEMBLED BY RALPH MOERITZ 2022/02 ;
+               ;     USING TURBO REASSEMBLER V2.0     ;
+               ;            BY YAP/ALBION             ;
+               ;--------------------------------------;
+
+                        *= $C000
+
+               ;--------------------------------------;
+               ; 16-BIT MULTIPLICATION                ;
+               ;--------------------------------------;
+
+C000 A9 00     DBMULT   LDA #$00
+                        .BLOCK
+C002 85 57              STA $57
+C004 85 58              STA $58
+C006 A0 08              LDY #$08
+C008 18                 CLC
+C009 26 5B     L1       ROL $5B
+C00B 90 0D              BCC L2
+C00D 18                 CLC
+C00E A5 57              LDA $57
+C010 65 59              ADC $59
+C012 85 57              STA $57
+C014 A5 58              LDA $58
+C016 65 5A              ADC $5A
+C018 85 58              STA $58
+C01A 88        L2       DEY
+C01B F0 06              BEQ DONE
+C01D 26 57              ROL $57
+C01F 26 58              ROL $58
+C021 90 E6              BCC L1
+C023 60        DONE     RTS
+                        .BEND
+
+               ;--------------------------------------;
+               ; CALCULATE 6000+3(X+40Y) --> SP(16B)  ;
+               ;--------------------------------------;
+
+C024 A9 50     L4       LDA #$50
+C026 85 5B              STA $5B
+C028 A9 00              LDA #$00
+C02A 85 5A              STA $5A
+C02C AD 18 C4           LDA $C418
+C02F 85 59              STA $59
+C031 20 00 C0           JSR DBMULT
+C034 AD 17 C4           LDA $C417
+C037 18                 CLC
+C038 65 57              ADC $57
+C03A 85 57              STA $57
+C03C A9 00              LDA #$00
+C03E 65 58              ADC $58
+C040 85 58              STA $58
+C042 A5 57              LDA $57
+C044 85 59              STA $59
+C046 A5 58              LDA $58
+C048 85 5A              STA $5A
+C04A 06 57              ASL $57
+C04C 26 58              ROL $58
+C04E 18                 CLC
+C04F A5 59              LDA $59
+C051 65 57              ADC $57
+C053 85 57              STA $57
+C055 A5 5A              LDA $5A
+C057 65 58              ADC $58
+C059 85 58              STA $58
+C05B A9 00              LDA #$00
+C05D 65 57              ADC $57
+C05F 85 57              STA $57
+C061 A9 60              LDA #$60
+C063 65 58              ADC $58
+C065 85 58              STA $58
+C067 60                 RTS
+
+               ;--------------------------------------;
+               ; CALCULATE 4 S(16B) --> SP1(16B)      ;
+               ;--------------------------------------;
+
+C068 AD 1E C4  L5       LDA $C41E
+C06B 0A                 ASL A
+C06C 85 59              STA $59
+C06E AD 1F C4           LDA $C41F
+C071 2A                 ROL A
+C072 85 5A              STA $5A
+C074 06 59              ASL $59
+C076 26 5A              ROL $5A
+C078 18                 CLC
+C079 A9 40              LDA #$40
+C07B 65 5A              ADC $5A
+C07D 85 5A              STA $5A
+C07F 60                 RTS
+
+               ;--------------------------------------;
+               ; CALCULATE 4 M(16B) --> SP1(16B)      ;
+               ;--------------------------------------;
+
+C080 AD 1C C4  L6       LDA $C41C
+C083 0A                 ASL A
+C084 85 59              STA $59
+C086 AD 1D C4           LDA $C41D
+C089 2A                 ROL A
+C08A 85 5A              STA $5A
+C08C 06 59              ASL $59
+C08E 26 5A              ROL $5A
+C090 18                 CLC
+C091 A9 40              LDA #$40
+C093 65 5A              ADC $5A
+C095 85 5A              STA $5A
+C097 60                 RTS
+
+               ;--------------------------------------;
+               ; INCREMENT X                          ;
+               ;--------------------------------------;
+
+C098 18        INCRX    CLC
+C099 A9 03              LDA #$03
+C09B 65 57              ADC $57
+C09D 85 57              STA $57
+C09F A9 00              LDA #$00
+C0A1 65 58              ADC $58
+C0A3 85 58              STA $58
+C0A5 60                 RTS
+
+               ;--------------------------------------;
+               ; INCREMENT Y                          ;
+               ;--------------------------------------;
+
+C0A6 18        INCRY    CLC
+C0A7 A9 F0              LDA #$F0
+C0A9 65 57              ADC $57
+C0AB 85 57              STA $57
+C0AD A9 00              LDA #$00
+C0AF 65 58              ADC $58
+C0B1 85 58              STA $58
+C0B3 60                 RTS
+
+               ;--------------------------------------;
+               ; DECREMENT X                          ;
+               ;--------------------------------------;
+
+C0B4 38        DECRX    SEC
+C0B5 A5 57              LDA $57
+C0B7 E9 03              SBC #$03
+C0B9 85 57              STA $57
+C0BB A5 58              LDA $58
+C0BD E9 00              SBC #$00
+C0BF 85 58              STA $58
+C0C1 60                 RTS
+
+               ;--------------------------------------;
+               ; DECREMENT Y                          ;
+               ;--------------------------------------;
+
+C0C2 38        DECRY    SEC
+C0C3 A5 57              LDA $57
+C0C5 E9 F0              SBC #$F0
+C0C7 85 57              STA $57
+C0C9 A5 58              LDA $58
+C0CB E9 00              SBC #$00
+C0CD 85 58              STA $58
+C0CF 60                 RTS
+
+               ;--------------------------------------;
+               ; INCREMENT M IF CELL @ X,Y IS ALIVE   ;
+               ;--------------------------------------;
+
+C0D0 AC 1A C4  CINCRM   LDY $C41A
+                        .BLOCK
+C0D3 B1 57              LDA ($57),Y
+C0D5 C9 01              CMP #$01
+C0D7 D0 03              BNE DONE
+C0D9 EE 20 C4           INC $C420
+C0DC 60        DONE     RTS
+                        .BEND
+
+               ;--------------------------------------;
+               ; RELEVANT AREA: STORE COORDINATES     ;
+               ;--------------------------------------;
+
+C0DD A0 02     STOCRDS  LDY #$02
+                        .BLOCK
+C0DF B1 57              LDA ($57),Y
+C0E1 C9 01              CMP #$01
+C0E3 F0 1F              BEQ DONE
+C0E5 A9 01              LDA #$01
+C0E7 A0 02              LDY #$02
+C0E9 91 57              STA ($57),Y
+C0EB 20 80 C0           JSR L6
+C0EE AD 17 C4           LDA $C417
+C0F1 AC 21 C4           LDY $C421
+C0F4 91 59              STA ($59),Y
+C0F6 C8                 INY
+C0F7 AD 18 C4           LDA $C418
+C0FA 91 59              STA ($59),Y
+C0FC EE 1C C4           INC $C41C
+C0FF D0 03              BNE DONE
+C101 EE 1D C4           INC $C41D
+C104 60        DONE     RTS
+                        .BEND
+
+               ;--------------------------------------;
+               ; RELEVANT AREA: ITERATE OVER 9        ;
+               ; NEIGHBOURING CELLS AND CALLS STOCRDS ;
+               ;--------------------------------------;
+
+C105 20 DD C0  STONBRS  JSR STOCRDS
+C108 EE 17 C4           INC $C417
+C10B 20 98 C0           JSR INCRX
+C10E 20 DD C0           JSR STOCRDS
+C111 EE 18 C4           INC $C418
+C114 20 A6 C0           JSR INCRY
+C117 20 DD C0           JSR STOCRDS
+C11A CE 17 C4           DEC $C417
+C11D 20 B4 C0           JSR DECRX
+C120 20 DD C0           JSR STOCRDS
+C123 CE 17 C4           DEC $C417
+C126 20 B4 C0           JSR DECRX
+C129 20 DD C0           JSR STOCRDS
+C12C CE 18 C4           DEC $C418
+C12F 20 C2 C0           JSR DECRY
+C132 20 DD C0           JSR STOCRDS
+C135 CE 18 C4           DEC $C418
+C138 20 C2 C0           JSR DECRY
+C13B 20 DD C0           JSR STOCRDS
+C13E EE 17 C4           INC $C417
+C141 20 98 C0           JSR INCRX
+C144 20 DD C0           JSR STOCRDS
+C147 EE 17 C4           INC $C417
+C14A 20 98 C0           JSR INCRX
+C14D 20 DD C0           JSR STOCRDS
+C150 CE 17 C4           DEC $C417
+C153 EE 18 C4           INC $C418
+C156 20 B4 C0           JSR DECRX
+C159 20 A6 C0           JSR INCRY
+C15C 60                 RTS
+
+               ;--------------------------------------;
+               ; NEXT GENERATION: ITERATE TWICE OVER  ;
+               ; ALL COORDINATES OF THE RELEVANT AREA ;
+               ;--------------------------------------;
+
+C15D CE 1C C4  NEXTGEN  DEC $C41C
+                        .BLOCK
+C160 AD 1C C4           LDA $C41C
+C163 8D 1E C4           STA $C41E
+C166 C9 FF              CMP #$FF
+C168 D0 03              BNE L17
+C16A CE 1D C4           DEC $C41D
+C16D AD 1D C4  L17      LDA $C41D
+C170 8D 1F C4           STA $C41F
+C173 20 80 C0  L18      JSR L6
+C176 AD 21 C4           LDA $C421
+C179 49 02              EOR #$02
+C17B A8                 TAY
+C17C B1 59              LDA ($59),Y
+C17E 8D 17 C4           STA $C417
+C181 C8                 INY
+C182 B1 59              LDA ($59),Y
+C184 8D 18 C4           STA $C418
+C187 20 24 C0           JSR L4
+C18A A9 00              LDA #$00
+C18C 8D 20 C4           STA $C420
+C18F A0 02              LDY #$02
+C191 91 57              STA ($57),Y
+C193 EE 17 C4           INC $C417
+C196 20 98 C0           JSR INCRX
+C199 20 D0 C0           JSR CINCRM
+C19C EE 18 C4           INC $C418
+C19F 20 A6 C0           JSR INCRY
+C1A2 20 D0 C0           JSR CINCRM
+C1A5 CE 17 C4           DEC $C417
+C1A8 20 B4 C0           JSR DECRX
+C1AB 20 D0 C0           JSR CINCRM
+C1AE CE 17 C4           DEC $C417
+C1B1 20 B4 C0           JSR DECRX
+C1B4 20 D0 C0           JSR CINCRM
+C1B7 CE 18 C4           DEC $C418
+C1BA 20 C2 C0           JSR DECRY
+C1BD 20 D0 C0           JSR CINCRM
+C1C0 CE 18 C4           DEC $C418
+C1C3 20 C2 C0           JSR DECRY
+C1C6 20 D0 C0           JSR CINCRM
+C1C9 EE 17 C4           INC $C417
+C1CC 20 98 C0           JSR INCRX
+C1CF 20 D0 C0           JSR CINCRM
+C1D2 EE 17 C4           INC $C417
+C1D5 20 98 C0           JSR INCRX
+C1D8 20 D0 C0           JSR CINCRM
+C1DB CE 17 C4           DEC $C417
+C1DE EE 18 C4           INC $C418
+C1E1 20 A6 C0           JSR INCRY
+C1E4 20 B4 C0           JSR DECRX
+C1E7 AD 20 C4           LDA $C420
+C1EA C9 02              CMP #$02
+C1EC D0 10              BNE L19
+C1EE AC 1A C4           LDY $C41A
+C1F1 B1 57              LDA ($57),Y
+C1F3 AA                 TAX
+C1F4 98                 TYA
+C1F5 49 01              EOR #$01
+C1F7 A8                 TAY
+C1F8 8A                 TXA
+C1F9 91 57              STA ($57),Y
+C1FB 4C 12 C2           JMP L21
+C1FE A2 00     L19      LDX #$00
+C200 AD 20 C4           LDA $C420
+C203 C9 03              CMP #$03
+C205 D0 02              BNE L20
+C207 A2 01              LDX #$01
+C209 AD 1A C4  L20      LDA $C41A
+C20C 49 01              EOR #$01
+C20E A8                 TAY
+C20F 8A                 TXA
+C210 91 57              STA ($57),Y
+C212 CE 1C C4  L21      DEC $C41C
+C215 A9 FF              LDA #$FF
+C217 CD 1C C4           CMP $C41C
+C21A D0 08              BNE L22
+C21C CE 1D C4           DEC $C41D
+C21F 10 03              BPL L22
+C221 4C 27 C2           JMP L23
+C224 4C 73 C1  L22      JMP L18
+C227 A9 00     L23      LDA #$00
+C229 8D 1C C4           STA $C41C
+C22C 8D 1D C4           STA $C41D
+C22F 20 68 C0  L24      JSR L5
+C232 AD 21 C4           LDA $C421
+C235 49 02              EOR #$02
+C237 A8                 TAY
+C238 B1 59              LDA ($59),Y
+C23A 8D 17 C4           STA $C417
+C23D C8                 INY
+C23E B1 59              LDA ($59),Y
+C240 8D 18 C4           STA $C418
+C243 20 24 C0           JSR L4
+C246 AD 1A C4           LDA $C41A
+C249 49 01              EOR #$01
+C24B A8                 TAY
+C24C B1 57              LDA ($57),Y
+C24E 8D 1B C4           STA $C41B
+C251 8D 14 C4           STA $C414
+C254 AC 1A C4           LDY $C41A
+C257 A9 00              LDA #$00
+C259 91 57              STA ($57),Y
+C25B AD 1B C4           LDA $C41B
+C25E C9 01              CMP #$01
+C260 D0 03              BNE L25
+C262 20 05 C1           JSR STONBRS
+C265 AD 14 C4  L25      LDA $C414
+C268 C9 01              CMP #$01
+C26A F0 0B              BEQ L26
+C26C A9 0F              LDA #$0F
+C26E 8D 14 C4           STA $C414
+C271 20 A5 C2           JSR PLOT
+C274 4C 7F C2           JMP L27
+C277 A9 00     L26      LDA #$00
+C279 8D 14 C4           STA $C414
+C27C 20 A5 C2           JSR PLOT
+C27F CE 1E C4  L27      DEC $C41E
+C282 AD 1E C4           LDA $C41E
+C285 C9 FF              CMP #$FF
+C287 D0 08              BNE L28
+C289 CE 1F C4           DEC $C41F
+C28C 10 03              BPL L28
+C28E 4C 94 C2           JMP L29
+C291 4C 2F C2  L28      JMP L24
+C294 AD 1A C4  L29      LDA $C41A
+C297 49 01              EOR #$01
+C299 8D 1A C4           STA $C41A
+C29C AD 21 C4           LDA $C421
+C29F 49 02              EOR #$02
+C2A1 8D 21 C4           STA $C421
+C2A4 60                 RTS
+                        .BEND
+
+               ;--------------------------------------;
+               ; PLOT: SET, CLEAR, AND CHECK POINTS   ;
+               ;--------------------------------------;
+
+C2A5 AD 17 C4  PLOT     LDA $C417
+                        .BLOCK
+C2A8 4A                 LSR A
+C2A9 8D 19 C4           STA $C419
+C2AC AD 18 C4           LDA $C418
+C2AF 4A                 LSR A
+C2B0 85 5B              STA $5B
+C2B2 A9 00              LDA #$00
+C2B4 85 5A              STA $5A
+C2B6 A9 28              LDA #$28
+C2B8 85 59              STA $59
+C2BA 20 00 C0           JSR DBMULT
+C2BD A9 04              LDA #$04
+C2BF 18                 CLC
+C2C0 65 58              ADC $58
+C2C2 18                 CLC
+C2C3 AD 19 C4           LDA $C419
+C2C6 65 57              ADC $57
+C2C8 85 57              STA $57
+C2CA A9 04              LDA #$04
+C2CC 65 58              ADC $58
+C2CE 85 58              STA $58
+C2D0 AD 17 C4           LDA $C417
+C2D3 29 01              AND #$01
+C2D5 F0 11              BEQ L32
+C2D7 AD 18 C4           LDA $C418
+C2DA 29 01              AND #$01
+C2DC F0 05              BEQ L31
+C2DE A9 01              LDA #$01
+C2E0 4C F6 C2           JMP L34
+C2E3 A9 04     L31      LDA #$04
+C2E5 4C F6 C2           JMP L34
+C2E8 AD 18 C4  L32      LDA $C418
+C2EB 29 01              AND #$01
+C2ED F0 05              BEQ L33
+C2EF A9 02              LDA #$02
+C2F1 4C F6 C2           JMP L34
+C2F4 A9 08     L33      LDA #$08
+C2F6 8D 15 C4  L34      STA $C415
+C2F9 AD 14 C4           LDA $C414
+C2FC C9 FF              CMP #$FF
+C2FE F0 18              BEQ L35
+C300 A0 00              LDY #$00
+C302 B1 57              LDA ($57),Y
+C304 AA                 TAX
+C305 BD 22 C4           LDA $C422,X
+C308 4D 14 C4           EOR $C414
+C30B 0D 15 C4           ORA $C415
+C30E 4D 14 C4           EOR $C414
+C311 AA                 TAX
+C312 BD 04 C4           LDA L49,X
+C315 91 57              STA ($57),Y
+C317 60                 RTS
+C318 A0 00     L35      LDY #$00
+C31A B1 57              LDA ($57),Y
+C31C AA                 TAX
+C31D BD 22 C4           LDA $C422,X
+C320 2D 15 C4           AND $C415
+C323 F0 08              BEQ L36
+C325 A9 01              LDA #$01
+C327 8D 16 C4           STA $C416
+C32A 4C 32 C3           JMP DONE
+C32D A9 00     L36      LDA #$00
+C32F 8D 16 C4           STA $C416
+C332 60        DONE     RTS
+                        .BEND
+
+               ;--------------------------------------;
+               ; INITIALIZATION ROUTINE               ;
+               ;--------------------------------------;
+
+                        .BLOCK
+C333 A9 00              LDA #$00
+C335 85 59              STA $59
+C337 A9 8E              LDA #$8E
+C339 85 5A              STA $5A
+C33B A2 4E              LDX #$4E
+C33D A0 DF              LDY #$DF
+C33F A9 00     L38      LDA #$00
+C341 91 59     L39      STA ($59),Y
+C343 88                 DEY
+C344 D0 F9              BNE L38
+C346 C6 5A              DEC $5A
+C348 CA                 DEX
+C349 10 F6              BPL L39
+C34B A9 00              LDA #$00
+C34D 85 57              STA $57
+C34F A9 60              LDA #$60
+C351 85 58              STA $58
+C353 A0 EF              LDY #$EF
+C355 A2 4F              LDX #$4F
+C357 A9 01              LDA #$01
+C359 91 57     L40      STA ($57),Y
+C35B 88                 DEY
+C35C 88                 DEY
+C35D 88                 DEY
+C35E CA                 DEX
+C35F 10 F8              BPL L40
+C361 A2 30              LDX #$30
+C363 A0 02     L41      LDY #$02
+C365 A9 01              LDA #$01
+C367 91 57              STA ($57),Y
+C369 A0 EF              LDY #$EF
+C36B 91 57              STA ($57),Y
+C36D 20 A6 C0           JSR INCRY
+C370 CA                 DEX
+C371 10 F0              BPL L41
+C373 A9 01              LDA #$01
+C375 A0 EF              LDY #$EF
+C377 A2 4F              LDX #$4F
+C379 91 57     L42      STA ($57),Y
+C37B 88                 DEY
+C37C 88                 DEY
+C37D 88                 DEY
+C37E CA                 DEX
+C37F 10 F8              BPL L42
+C381 A2 00              LDX #$00
+C383 A9 00              LDA #$00
+C385 9D 22 C4  L43      STA $C422,X
+C388 CA                 DEX
+C389 D0 FA              BNE L43
+C38B A2 0F              LDX #$0F
+C38D BD 04 C4  L44      LDA L49,X
+C390 A8                 TAY
+C391 8A                 TXA
+C392 99 22 C4           STA $C422,Y
+C395 CA                 DEX
+C396 10 F5              BPL L44
+C398 A9 00              LDA #$00
+C39A 8D 21 C4           STA $C421
+C39D 8D 1A C4           STA $C41A
+C3A0 8D 1C C4           STA $C41C
+C3A3 8D 1D C4           STA $C41D
+C3A6 60                 RTS
+                        .BEND
+
+               ;--------------------------------------;
+               ; CALL RELEVANT AREA: SET A%(X,Y)=1 TO ;
+               ; COORDINATES OF NEIGHBOURING CELLS    ;
+               ;--------------------------------------;
+
+C3A7 20 FD AE           JSR $AEFD
+C3AA 20 9E B7           JSR $B79E
+C3AD 8E 17 C4           STX $C417
+C3B0 20 FD AE           JSR $AEFD
+C3B3 20 9E B7           JSR $B79E
+C3B6 8E 18 C4           STX $C418
+C3B9 20 24 C0           JSR L4
+C3BC A0 00              LDY #$00
+C3BE A9 01              LDA #$01
+C3C0 91 57              STA ($57),Y
+C3C2 4C 05 C1           JMP STONBRS
+
+               ;--------------------------------------;
+               ; CALL PLOT: CLEAR, SET, OR CHECK      ;
+               ; CELLS                                ;
+               ;--------------------------------------;
+
+                        .BLOCK
+C3C5 20 FD AE           JSR $AEFD
+C3C8 20 9E B7           JSR $B79E
+C3CB 8E 17 C4           STX $C417
+C3CE 20 FD AE           JSR $AEFD
+C3D1 20 9E B7           JSR $B79E
+C3D4 8E 18 C4           STX $C418
+C3D7 20 FD AE           JSR $AEFD
+C3DA 20 9E B7           JSR $B79E
+C3DD E0 01              CPX #$01
+C3DF F0 09              BEQ L45
+C3E1 E0 02              CPX #$02
+C3E3 F0 0A              BEQ L46
+C3E5 A9 0F              LDA #$0F
+C3E7 4C F1 C3           JMP L47
+C3EA A9 00     L45      LDA #$00
+C3EC 4C F1 C3           JMP L47
+C3EF A9 FF     L46      LDA #$FF
+C3F1 8D 14 C4  L47      STA $C414
+C3F4 4C A5 C2           JMP PLOT
+                        .BEND
+
+               ;--------------------------------------;
+               ; DISABLE INTERRUPTS & CALL NEXTGEN    ;
+               ;--------------------------------------;
+
+C3F7 78                 SEI
+C3F8 20 5D C1           JSR NEXTGEN
+C3FB 58                 CLI
+C3FC 60                 RTS
+
+               ;--------------------------------------;
+               ; MAX SPEED: DISABLE INTERRUPTS & CALL ;
+               ; NEXTGEN IN INFINITE LOOP             ;
+               ;--------------------------------------;
+
+                        .BLOCK
+C3FD 78                 SEI
+C3FE 20 5D C1  LOOP     JSR NEXTGEN
+C401 4C FE C3           JMP LOOP
+                        .BEND
+
+C404 20 6C 7B 62
+               L49      .BYTE $20,$6C,$7B,$62
+C408 7C E1 FF FE
+                        .BYTE $7C,$E1,$FF,$FE
+C40C 7E 7F 61 FC
+                        .BYTE $7E,$7F,$61,$FC
+C410 E2 FB EC A0
+                        .BYTE $E2,$FB,$EC,$A0
+C414 FF                 .BYTE $FF
